@@ -42,7 +42,7 @@ export default function PatientDashboard() {
     const fetchPatient=async()=>{
       try{
         const res=await axios.get(process.env.VITE_API_URL+"/patients")
-        console.log(res.data)
+        // console.log(res.data)
         setPatients(res.data)
         setLoading(false)
       }catch(e){
