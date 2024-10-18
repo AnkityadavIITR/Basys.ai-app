@@ -41,7 +41,7 @@ export default function PriorAuthorizationForm({
 
     const fetchAuthorization = async () => {
       try {
-        console.log(import.meta.env.VITE_API_URL);
+        // console.log(import.meta.env.VITE_API_URL);
         const res = await axios.get(
           "https://basys-ai-server.vercel.app/api/authorizations/"+patientId
         );
