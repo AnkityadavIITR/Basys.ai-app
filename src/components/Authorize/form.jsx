@@ -33,53 +33,48 @@ export default function PriorAuthorizationForm({
   const [alreadySubmitted, setAlreadySubmitted] = useState(false);
 
   useEffect(() => {
-    console.log("useEffect triggered, patientId:", patientId); // Add this for debugging
     setAuthData(null);
     setAlreadySubmitted(false);
 
-    if (!patientId) return; // Prevents calling the API if patientId is not available
+    if (!patientId) return;
     setLoading(true);
 
     const fetchAuthorization = async () => {
       try {
+        console.log(import.meta.env.VITE_API_URL);
         const res = await axios.get(
-          `http://localhost:3000/api/authorizations/${patientId}`
+          import.meta.env.VITE_API_URL+"/authorizations/"+patientId
         );
-        console.log("res", res);
         if (!res.data.success) {
           setLoading(false);
           return;
         }
-        console.log("res.data", res.data.data);
-
         setAuthData(res.data.data);
         setAlreadySubmitted(true);
-        // console.log("Fetched authorization data:", res.data); // Debugging: Log fetched data
       } catch (error) {
         console.error("Error fetching authorization data:", error);
       } finally {
-        setLoading(false); // Ensure loading is set to false even if there's an error
+        setLoading(false);
       }
     };
 
     fetchAuthorization();
-  }, [patientId]); // Make sure to include patientId in the dependency array
+  }, [patientId]);
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     setSubmitting(true);
-    // Your submission logic...
     try {
       const res = await axios.post(
-        `http://localhost:3000/api/authorizations/post`,
+        import.meta.env.VITE_API_URL+"/authorizations/post",
         values
       );
-      console.log(res);
+      alert("Request submitted successfully");
     } catch (error) {
       console.log(error);
     } finally {
       setSubmitting(false);
       resetForm();
-      setOpenDialogPatientId(null); // Closing dialog after submission
+      setOpenDialogPatientId(null);
     }
   };
 

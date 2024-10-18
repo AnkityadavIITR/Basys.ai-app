@@ -15,6 +15,7 @@ import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import PriorAuthorizationForm from "@/components/Authorize/form";
 import axios from "axios";
 
+
 export default function PatientDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedPatient, setSelectedPatient] = useState(null);
@@ -32,10 +33,7 @@ export default function PatientDashboard() {
 
     const fetchPatient = async () => {
       try {
-        // console.log("All env variables:", import.meta.env);
-        // console.log("VITE_API_URL:", import.meta.env.VITE_API_URL);
-
-        const res = await axios.get("http://localhost:3000/api/patients");
+        const res = await axios.get(import.meta.env.VITE_API_URL+"/patients");
         setPatients(res.data);
         setLoading(false);
       } catch (e) {
@@ -78,11 +76,11 @@ export default function PatientDashboard() {
     setSelectedPatient(patient);
   };
   const handleDialogOpen = (patientId) => {
-    setOpenDialogPatientId(patientId); // Open the dialog for the selected patient
-    setSelectedPatient(null); // Reset selectedPatient if needed (optional)
+    setOpenDialogPatientId(patientId);
+    setSelectedPatient(null); 
 };
   const handleDialogClose = () => {
-    setOpenDialogPatientId(null); // Close the dialog
+    setOpenDialogPatientId(null); 
   };
 
   if (loading) {
@@ -176,7 +174,7 @@ export default function PatientDashboard() {
                       </Button>
                     </DialogTrigger>
                     <PriorAuthorizationForm
-                      patientId={openDialogPatientId} // Pass the patient ID to the form
+                      patientId={openDialogPatientId} 
                       setOpenDialogPatientId={setOpenDialogPatientId}
                     />
                   </Dialog>
@@ -209,7 +207,6 @@ export default function PatientDashboard() {
             ))}
           </p>
 
-          {/* Add more detailed information here */}
         </div>
       )}
     </div>
