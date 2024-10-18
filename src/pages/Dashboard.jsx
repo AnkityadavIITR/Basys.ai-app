@@ -188,16 +188,16 @@ export default function PatientDashboard() {
         <div className="mt-4 p-4 border rounded-lg">
           <h2 className="text-xl font-semibold mb-2">Patient Details</h2>
           <p>
-            <strong>Name:</strong> {selectedPatient.name}
+            <strong>Name:</strong> {selectedPatient?.name}
           </p>
           <p>
-            <strong>Age:</strong> {selectedPatient.age}
+            <strong>Age:</strong> {selectedPatient?.age}
           </p>
           <p>
-            <strong>Condition:</strong> {selectedPatient.condition}
+            <strong>Condition:</strong> {selectedPatient?.condition}
           </p>
           <p>
-            <strong>Treatment Plan:</strong> {selectedPatient.treatmentPlan}
+            <strong>Treatment Plan:</strong> {selectedPatient?.treatmentPlan}
           </p>
 
           <p>
