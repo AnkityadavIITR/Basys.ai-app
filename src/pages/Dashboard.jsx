@@ -34,6 +34,7 @@ export default function PatientDashboard() {
     const fetchPatient = async () => {
       
       try {
+        console.log("Fetching data from:", "https://basys-ai-server.vercel.app/api/patients");
         const res = await axios.get("https://basys-ai-server.vercel.app/api/patients");
         setPatients(res.data);
         setLoading(false);
