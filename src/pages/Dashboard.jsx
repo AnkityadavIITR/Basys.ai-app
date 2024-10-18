@@ -1,4 +1,4 @@
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Search, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,23 +11,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Dialog, DialogTrigger,DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import PriorAuthorizationForm from "@/components/Authorize/form";
 import axios from "axios";
-
-// Placeholder data
-// const patients = [
-//   { id: 1, name: "John Doe", age: 45, condition: "Hypertension" },
-//   { id: 2, name: "Jane Smith", age: 32, condition: "Diabetes" },
-//   { id: 3, name: "Bob Johnson", age: 58, condition: "Arthritis" },
-//   { id: 4, name: "Alice Brown", age: 27, condition: "Asthma" },
-//   { id: 5, name: "Charlie Davis", age: 63, condition: "Heart Disease" },
-// ];
 
 export default function PatientDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedPatient, setSelectedPatient] = useState(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [openDialogPatientId, setOpenDialogPatientId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [patients, setPatients] = useState([]);
@@ -39,30 +30,31 @@ export default function PatientDashboard() {
   useEffect(() => {
     setLoading(true);
 
-    const fetchPatient=async()=>{
-      try{
-        const res=await axios.get(process.env.VITE_API_URL+"/patients")
-        // console.log(res.data)
-        setPatients(res.data)
-        setLoading(false)
-      }catch(e){
-        console.log(e)
-        setLoading(false)
+    const fetchPatient = async () => {
+      try {
+        // console.log("All env variables:", import.meta.env);
+        // console.log("VITE_API_URL:", import.meta.env.VITE_API_URL);
+
+        const res = await axios.get("http://localhost:3000/api/patients");
+        setPatients(res.data);
+        setLoading(false);
+      } catch (e) {
+        console.log(e);
+        setLoading(false);
       }
-    }
-    fetchPatient()
-  },[]);
+    };
+    fetchPatient();
+  }, []);
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   };
 
-  const filteredPatients = patients.filter(
+  const filteredPatients = patients?.filter(
     (patient) =>
       patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       patient.condition.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
 
   const handleSort = (key) => {
     let direction = "ascending";
@@ -87,13 +79,14 @@ export default function PatientDashboard() {
   };
   const handleDialogOpen = (patientId) => {
     setOpenDialogPatientId(patientId); // Open the dialog for the selected patient
-  };
+    setSelectedPatient(null); // Reset selectedPatient if needed (optional)
+};
   const handleDialogClose = () => {
     setOpenDialogPatientId(null); // Close the dialog
   };
 
-  if(loading){
-    return <Modal open={loading} setOpen={setLoading}></Modal>
+  if (loading) {
+    return <Modal open={loading} setOpen={setLoading} type={"nocross"}></Modal>;
   }
 
   return (
@@ -167,7 +160,7 @@ export default function PatientDashboard() {
                   </Button>
                 </TableCell>
                 <TableCell>
-                <Dialog
+                  <Dialog
                     open={openDialogPatientId === patient._id} // Check if the dialog should be open for this patient
                     onOpenChange={(isOpen) => {
                       if (isOpen) {
@@ -182,9 +175,11 @@ export default function PatientDashboard() {
                         Start Prior Authorization Request
                       </Button>
                     </DialogTrigger>
-                    <PriorAuthorizationForm patientId={patient._id} />
+                    <PriorAuthorizationForm
+                      patientId={openDialogPatientId} // Pass the patient ID to the form
+                      setOpenDialogPatientId={setOpenDialogPatientId}
+                    />
                   </Dialog>
-                  
                 </TableCell>
               </TableRow>
             ))}
@@ -203,6 +198,17 @@ export default function PatientDashboard() {
           <p>
             <strong>Condition:</strong> {selectedPatient.condition}
           </p>
+          <p>
+            <strong>Treatment Plan:</strong> {selectedPatient.treatmentPlan}
+          </p>
+
+          <p>
+            <strong>Medical History:</strong>{" "}
+            {selectedPatient.medicalHistory.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </p>
+
           {/* Add more detailed information here */}
         </div>
       )}

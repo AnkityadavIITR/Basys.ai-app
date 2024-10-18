@@ -4,14 +4,14 @@ import * as Yup from "yup";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import axios from "axios";
 import {
-  Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 // import { useToast } from "@/components/hooks/use-toast"
 
 const PriorAuthorizationSchema = Yup.object().shape({
@@ -19,29 +19,68 @@ const PriorAuthorizationSchema = Yup.object().shape({
   insurancePlan: Yup.string().required("Insurance plan is required"),
   dateOfService: Yup.date().required("Date of service is required"),
   diagnosisCode: Yup.string().required("Diagnosis code is required"),
-  providerId: Yup.string().required("Provider ID is required"),
+  doctorNotes: Yup.string(),
   patientId: Yup.string().required("Patient ID is required"),
 });
 
-export default function PriorAuthorizationForm({ patientId }) {
+export default function PriorAuthorizationForm({
+  patientId,
+  setOpenDialogPatientId,
+}) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [authData, setAuthData] = useState(null);
+  const [alreadySubmitted, setAlreadySubmitted] = useState(false);
 
   useEffect(() => {
+    console.log("useEffect triggered, patientId:", patientId); // Add this for debugging
+    setAuthData(null);
+    setAlreadySubmitted(false);
+
+    if (!patientId) return; // Prevents calling the API if patientId is not available
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-  });
+
+    const fetchAuthorization = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:3000/api/authorizations/${patientId}`
+        );
+        console.log("res", res);
+        if (!res.data.success) {
+          setLoading(false);
+          return;
+        }
+        console.log("res.data", res.data.data);
+
+        setAuthData(res.data.data);
+        setAlreadySubmitted(true);
+        // console.log("Fetched authorization data:", res.data); // Debugging: Log fetched data
+      } catch (error) {
+        console.error("Error fetching authorization data:", error);
+      } finally {
+        setLoading(false); // Ensure loading is set to false even if there's an error
+      }
+    };
+
+    fetchAuthorization();
+  }, [patientId]); // Make sure to include patientId in the dependency array
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
-    setIsSubmitting(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log(values);
-    setIsSubmitting(false);
-    setIsDialogOpen(false);
-    resetForm();
+    setSubmitting(true);
+    // Your submission logic...
+    try {
+      const res = await axios.post(
+        `http://localhost:3000/api/authorizations/post`,
+        values
+      );
+      console.log(res);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setSubmitting(false);
+      resetForm();
+      setOpenDialogPatientId(null); // Closing dialog after submission
+    }
   };
 
   return (
@@ -61,12 +100,12 @@ export default function PriorAuthorizationForm({ patientId }) {
         ) : (
           <Formik
             initialValues={{
-              treatmentType: "",
-              insurancePlan: "",
-              dateOfService: "",
-              diagnosisCode: "",
-              providerId: "",
-              patientId: "",
+              treatmentType: authData?.[0]?.treatmentType || "",
+              insurancePlan: authData?.[0]?.insurancePlan || "",
+              dateOfService: authData?.[0]?.dateOfService || "",
+              diagnosisCode: authData?.[0]?.diagnosisCode || "",
+              doctorNotes: authData?.[0]?.doctorNotes || "",
+              patientId: patientId,
             }}
             validationSchema={PriorAuthorizationSchema}
             onSubmit={handleSubmit}
@@ -79,6 +118,7 @@ export default function PriorAuthorizationForm({ patientId }) {
                     as={Input}
                     id="treatmentType"
                     name="treatmentType"
+                    disabled={alreadySubmitted}
                     placeholder="Enter treatment type"
                     className={
                       errors.treatmentType && touched.treatmentType
@@ -99,6 +139,7 @@ export default function PriorAuthorizationForm({ patientId }) {
                     as={Input}
                     id="insurancePlan"
                     name="insurancePlan"
+                    disabled={alreadySubmitted}
                     placeholder="Enter insurance plan"
                     className={
                       errors.insurancePlan && touched.insurancePlan
@@ -119,6 +160,7 @@ export default function PriorAuthorizationForm({ patientId }) {
                     as={Input}
                     id="dateOfService"
                     name="dateOfService"
+                    disabled={alreadySubmitted}
                     type="date"
                     className={
                       errors.dateOfService && touched.dateOfService
@@ -139,6 +181,7 @@ export default function PriorAuthorizationForm({ patientId }) {
                     as={Input}
                     id="diagnosisCode"
                     name="diagnosisCode"
+                    disabled={alreadySubmitted}
                     placeholder="Enter diagnosis code"
                     className={
                       errors.diagnosisCode && touched.diagnosisCode
@@ -154,20 +197,21 @@ export default function PriorAuthorizationForm({ patientId }) {
                 </div>
 
                 <div>
-                  <Label htmlFor="providerId">Provider ID</Label>
+                  <Label htmlFor="providerId">Doctor Notes</Label>
                   <Field
                     as={Input}
-                    id="providerId"
-                    name="providerId"
-                    placeholder="Enter provider ID"
+                    id="doctorNotes"
+                    name="doctorNotes"
+                    disabled={alreadySubmitted}
+                    placeholder="Enter Doctor Notes"
                     className={
-                      errors.providerId && touched.providerId
+                      errors.doctorNotes && touched.doctorNotes
                         ? "border-red-500"
                         : ""
                     }
                   />
                   <ErrorMessage
-                    name="providerId"
+                    name="doctorNotes"
                     component="div"
                     className="text-red-500 text-sm mt-1"
                   />
@@ -179,6 +223,7 @@ export default function PriorAuthorizationForm({ patientId }) {
                     as={Input}
                     id="patientId"
                     name="patientId"
+                    disabled={alreadySubmitted}
                     value={patientId}
                     placeholder="Enter patient ID"
                     className={
@@ -194,9 +239,14 @@ export default function PriorAuthorizationForm({ patientId }) {
                   />
                 </div>
 
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? "Submitting..." : "Submit Request"}
-                </Button>
+                <div className="flex gap-x-8">
+                  <Button type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? "Submitting..." : "Submit Request"}
+                  </Button>
+                  {alreadySubmitted && (
+                    <Badge className="bg-[#ffde21]">Pending</Badge>
+                  )}
+                </div>
               </Form>
             )}
           </Formik>

@@ -5,9 +5,9 @@ import {
   DialogHeader,
 } from "@/components/ui/dialog";
 
-const Modal = ({open,setOpen}) => {
+const Modal = ({open,setOpen,type}) => {
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={setOpen} type={type} >
       <DialogContent className="max-w-[323px] bg-[#FCFDFF] pt-0">
         <h1>Loading...</h1>
       </DialogContent>
