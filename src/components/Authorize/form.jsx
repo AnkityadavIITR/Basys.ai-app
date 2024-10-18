@@ -43,7 +43,7 @@ export default function PriorAuthorizationForm({
       try {
         console.log(import.meta.env.VITE_API_URL);
         const res = await axios.get(
-          import.meta.env.VITE_API_URL+"/authorizations/"+patientId
+          "https://basys-ai-server.vercel.app/api/authorizations/"+patientId
         );
         if (!res.data.success) {
           setLoading(false);
@@ -65,7 +65,7 @@ export default function PriorAuthorizationForm({
     setSubmitting(true);
     try {
       const res = await axios.post(
-        import.meta.env.VITE_API_URL+"/authorizations/post",
+        "https://basys-ai-server.vercel.app/api"+"/authorizations/post",
         values
       );
       alert("Request submitted successfully");
