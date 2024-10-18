@@ -32,12 +32,14 @@ export default function PatientDashboard() {
     setLoading(true);
 
     const fetchPatient = async () => {
+      console.log(import.meta.env.VITE_API_URL);
+      
       try {
         const res = await axios.get(import.meta.env.VITE_API_URL+"/patients");
         setPatients(res.data);
         setLoading(false);
       } catch (e) {
-        console.log(e);
+        // console.log(e);
         setLoading(false);
       }
     };
