@@ -31,7 +31,6 @@ export default function PatientDashboard() {
   useEffect(() => {
     setLoading(true);
 
-    console.log("url",import.meta.env.VITE_API_URL);
     const fetchPatient = async () => {
       
       try {
